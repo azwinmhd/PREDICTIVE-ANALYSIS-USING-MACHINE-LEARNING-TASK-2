@@ -17,3 +17,7 @@ To better understand the clustering results, we visualize the clusters using a s
 Finally, we conduct a cluster analysis by calculating the mean values of various features for each cluster. This analysis helps in understanding the characteristics of each customer segment, such as average age, income, and spending behavior. Furthermore, we can visualize the distribution of other features, such as age, across clusters using box plots, providing a comprehensive view of how different customer segments vary.
 
 In summary, this task demonstrates the application of KMeans clustering to segment mall customers based on their income and spending behavior. By leveraging data exploration, preprocessing, and visualization techniques, we gain valuable insights into customer segments, which can inform marketing strategies and enhance customer engagement.
+
+Output:
+
+![Image](https://github.com/user-attachments/assets/60f212ae-78cf-4771-a1eb-7147cfeccc6d)
