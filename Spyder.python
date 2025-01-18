@@ -1,0 +1,80 @@
+import pandas as pd
+import sys
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+import seaborn as sns  # For better visualizations
+
+try:
+    df = pd.read_csv("C:/Users/HP/Desktop/Mall_Customers.csv")
+except FileNotFoundError:
+    print("Error: Mall_Customers.csv not found. Please download it and place it in the correct directory.")
+    sys.exit()
+
+# Basic Data Exploration (Optional but Recommended)
+print("Data Info:")
+df.info()
+print("\nFirst 5 rows:")
+print(df.head())
+print("\nData Description:")
+print(df.describe())
+
+# Handle potential missing values (if any)
+# Check for missing values
+print("\nMissing values:")
+print(df.isnull().sum())
+# If there are missing values, you can use imputation or drop rows/columns.
+# Example using imputation (if needed):
+# df['Age'].fillna(df['Age'].mean(), inplace=True)
+
+# Select features for clustering
+X = df[['Annual Income (k$)', 'Spending Score (1-100)']]
+
+# Feature Scaling (Important for KMeans)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Determine optimal number of clusters using the Elbow Method
+wcss = []
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters=i, init='k-means++', random_state=42)
+    kmeans.fit(X_scaled)
+    wcss.append(kmeans.inertia_)
+
+plt.figure(figsize=(10, 6))  # Adjust figure size for better visualization
+plt.plot(range(1, 11), wcss, marker='o', linestyle='--')
+plt.title('The Elbow Method')
+plt.xlabel('Number of clusters')
+plt.ylabel('WCSS')
+plt.xticks(range(1, 11))  # Ensure all x-axis ticks are shown
+plt.grid(True)
+plt.show()
+
+# Apply KMeans clustering (using the optimal number of clusters from the Elbow Method)
+n_clusters = 5  # You might need to adjust this based on the Elbow Method plot
+kmeans = KMeans(n_clusters=n_clusters, init='k-means++', random_state=42)
+y_kmeans = kmeans.fit_predict(X_scaled)
+
+# Add cluster assignments back to the original DataFrame
+df['Cluster'] = y_kmeans
+
+# Visualize the clusters using Seaborn for better aesthetics
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='Annual Income (k$)', y='Spending Score (1-100)', hue='Cluster', data=df, palette='viridis', s=100)
+plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=300, c='red', marker='X', label='Centroids')
+plt.title('Clusters of Customers')
+plt.xlabel('Annual Income (k$)')
+plt.ylabel('Spending Score (1-100)')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Further analysis based on clusters (optional)
+print("\nCluster Analysis:")
+print(df.groupby('Cluster').mean())
+
+# Example using other columns
+plt.figure(figsize=(10,6))
+sns.boxplot(x='Cluster', y='Age', data=df)
+plt.title('Age distribution in each Cluster')
+plt.show()
